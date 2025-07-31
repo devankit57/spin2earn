@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId             String              @id @default(uuid())
+  email              String              @unique
+  passwordHash       String
+  joinDate           DateTime
+  dailySpins         Int
+  xpPoints           Int
+  level              Int
+  streakCount        Int
+  lastSpinDate       DateTime
+  spinHistory        SpinHistory[]
+  wallet             Wallet[]
+  referrer           Referral[]           @relation(name: "referrer")
+  referee            Referral[]           @relation(name: "referee")
+  achievements       Achievement[]
+  redemptions        Redemption[]
+}
+
+
+model SpinHistory {
+  spinId             String              @id @default(uuid())
+  userId             String              
+  spinTime           DateTime
+  rewardId           String
+  isWinner           Boolean
+  user               User                @relation(fields: [userId], references: [userId])
+  reward             Reward              @relation(fields: [rewardId], references: [id]) 
+}
+
+
+model Wallet {
+  id                 String              @id @default(uuid())
+  userId             String              @unique
+  tokenBalance       Int 
+  cryptoBalance      Int
+  coupons            String[]
+  jackpotTickets     Int     
+  user               User                @relation(fields: [userId], references: [userId])
+}
+
+
+model Referral {
+  id                String               @id @default(uuid())
+  referrerId        String               
+  refereeId         String               @unique
+  referralDate      DateTime  
+  comissonEarned    Int  
+  referrer          User                 @relation(name: "referrer", fields: [referrerId], references: [userId])
+  referee           User                 @relation(name: "referee", fields: [refereeId], references: [userId])
+}
+
+
+model Achievement {
+  id                String               @id @default(uuid())
+  userId            String               @unique
+  name              String
+  earnedDate        DateTime
+  user               User                @relation(fields: [userId], references: [userId])
+}
+
+
+model Redemption {
+  id                String               @id @default(uuid())
+  userId            String               @unique
+  rewardId          String                
+  requestDate       DateTime
+  processDate       DateTime
+  user              User                @relation(fields: [userId], references: [userId])
+  reward            Reward              @relation(fields: [rewardId], references: [id]) 
+}
+
+
+model Reward {
+  id                String               @id @default(uuid())
+  name              String
+  type              String 
+  value             Int 
+  probability       Float
+  is_active         Boolean
+  redemption        Redemption[]
+  spinHistory       SpinHistory[]
+}
+
+
+model Admin {
+  id                String               @id @default(uuid()) 
+  email             String               @unique
+  passwordHash      String
+  accessLevel       String
+}

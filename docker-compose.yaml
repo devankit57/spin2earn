@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres
+    container_name: spin2winDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - spin2winDBVolume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+
+volumes:
+  spin2winDBVolume:

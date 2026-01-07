@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
-import confetti from "canvas-confetti"; 
+import confetti from "canvas-confetti";  
 
 export default function Spinner() {
   const rewards = [
